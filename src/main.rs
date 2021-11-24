@@ -1,7 +1,7 @@
 #![windows_subsystem = "windows"]
 
 use nwd::NwgUi;
-use nwg::NativeUi;
+use nwg::{self, NativeUi};
 
 #[derive(Default, NwgUi)]
 pub struct SystemTray {
@@ -12,7 +12,10 @@ pub struct SystemTray {
     icon: nwg::Icon,
 
     #[nwg_control(icon: Some(&data.icon), tip: Some("Hello"))]
-    #[nwg_events(MousePressLeftUp: [SystemTray::show_menu], OnContextMenu: [SystemTray::show_menu])]
+    #[nwg_events(
+        MousePressLeftUp: [SystemTray::show_menu], 
+        OnContextMenu: [SystemTray::show_menu]
+    )]
     tray: nwg::TrayNotification,
 
     #[nwg_control(parent: window, popup: true)]
@@ -40,6 +43,7 @@ impl SystemTray {
     fn hello1(&self) {
         nwg::simple_message("Hello", "Hello World!");
     }
+
     fn hello2(&self) {
         let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
         self.tray.show(
@@ -49,6 +53,7 @@ impl SystemTray {
             Some(&self.icon),
         );
     }
+
     fn exit(&self) {
         nwg::stop_thread_dispatch();
     }
