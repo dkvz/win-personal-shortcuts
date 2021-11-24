@@ -1,0 +1,10 @@
+[package]
+name = "win-personal-shortcuts"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nwg = {version = "^1.0.12", package = "native-windows-gui"}
+nwd = {version = "^1.0.4", package = "native-windows-derive"}
