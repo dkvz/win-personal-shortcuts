@@ -21,3 +21,6 @@ Example using winapi.
 ## Other libs
 - Easier messageboxes: https://github.com/bekker/msgbox-rs
 - Actually I'm just gonna run from system tray: https://github.com/gabdube/native-windows-gui/blob/master/native-windows-gui/examples/system_tray_d.rs
+
+# TODO
+- [] Uncomment the windows subsystem thingy in main.rs.

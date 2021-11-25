@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 nwg = {version = "^1.0.12", package = "native-windows-gui"}
 nwd = {version = "^1.0.4", package = "native-windows-derive"}
+inputbot = "0.5.0"
