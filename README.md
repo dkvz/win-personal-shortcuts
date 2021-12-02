@@ -3,7 +3,7 @@
 
 Meant to associate keyboard events to running or stopping things.
 
-The main use case is to replace the Nvidia ShadowPlay start & stop recording with this and OBS Studio.
+The main use case is to replace the Nvidia ShadowPlay start & stop recording with this and OBS Studio and I should probably rename the project to reflect that.
 
 Appears in the system tray when started.
 
