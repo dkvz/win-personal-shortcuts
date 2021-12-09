@@ -9,3 +9,7 @@ edition = "2021"
 nwg = {version = "^1.0.12", package = "native-windows-gui"}
 nwd = {version = "^1.0.4", package = "native-windows-derive"}
 inputbot = "0.5.0"
+config = "0.11"
+serde_derive = "^1.0.8"
+serde = "^1.0.8"
+dotenv = "0.15.0"

@@ -1,4 +1,4 @@
-use inputbot::{KeybdKey::*, MouseButton::*, *};
+use inputbot::{KeybdKey::*, *};
 use std::sync::atomic::{AtomicBool, Ordering};
 //use std::{thread::sleep, time::Duration};
 
