@@ -1,7 +1,10 @@
 use config::{Config, ConfigError, Environment};
 use serde_derive::Deserialize;
+use std::default::Default;
 
-#[derive(Debug, Deserialize)]
+// AppConfig is a property of the "ui" struct
+// Hence needs to implement Default
+#[derive(Debug, Deserialize, Default)]
 pub struct AppConfig {
   pub obs_path: String,
   pub obs_profile: String,
