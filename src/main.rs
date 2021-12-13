@@ -18,7 +18,7 @@ fn main() -> Result<()> {
     let _ui = PShortcutsTray::build_ui(Default::default()).expect("Failed to build UI");
     // I don't think we can avoid having another thread for the
     // keyboard events:
-    thread::spawn(bind_kb_events);
+    thread::spawn(move || bind_kb_events(app_config));
     // This will block the main thread:
     nwg::dispatch_thread_events();
 
