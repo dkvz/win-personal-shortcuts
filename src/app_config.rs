@@ -7,6 +7,7 @@ use std::default::Default;
 #[derive(Debug, Deserialize, Default)]
 pub struct AppConfig {
   pub obs_path: String,
+  pub obs_exe: String,
   pub obs_profile: String,
 }
 
@@ -16,11 +17,9 @@ impl AppConfig {
 
     // These have to be lowercase even if
     // env var names are uppercase:
-    c.set_default(
-      "obs_path",
-      r"C:\Program Files\obs-studio\bin\64bit\obs64.exe",
-    )?;
+    c.set_default("obs_path", r"C:\Program Files\obs-studio\bin\64bit")?;
     c.set_default("obs_profile", "Recording")?;
+    c.set_default("obs_exe", "obs64.exe")?;
 
     c.merge(Environment::default())?;
 

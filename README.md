@@ -7,6 +7,9 @@ The main use case is to replace the Nvidia ShadowPlay start & stop recording wit
 
 Appears in the system tray when started.
 
+## Configure
+- Copy `.env.example` as `.env` and edit the variables. Backslashes have to be escaped in Windows paths.
+
 ## Keyboard lib
 - Looks promising: https://github.com/obv-mikhail/InputBot
 

@@ -13,6 +13,7 @@ use eyre::Result;
 
 fn main() -> Result<()> {
     dotenv().ok();
+
     nwg::init().expect("Failed to init Native Windows GUI");
     let app_config = AppConfig::from_env().expect("Config error - Should not happen");
     let _ui = PShortcutsTray::build_ui(Default::default()).expect("Failed to build UI");
