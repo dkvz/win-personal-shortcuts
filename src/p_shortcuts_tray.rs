@@ -32,16 +32,26 @@ pub struct PShortcutsTray {
   #[nwg_control(parent: tray_menu, text: "Exit")]
   #[nwg_events(OnMenuItemSelected: [PShortcutsTray::exit])]
   tray_item3: nwg::MenuItem,
+
+  text: String
 }
 
 impl PShortcutsTray {
+
+  pub fn new(text: String) -> Self {
+    Self {
+      text: text,
+      ..Default::default()
+    }
+  }
+
   fn show_menu(&self) {
       let (x, y) = nwg::GlobalCursor::position();
       self.tray_menu.popup(x, y);
   }
 
   fn hello1(&self) {
-      nwg::simple_message("Hello", "Hello World!");
+      nwg::simple_message("Hello", &self.text);
   }
 
   fn hello2(&self) {

@@ -16,7 +16,8 @@ fn main() -> Result<()> {
 
     nwg::init().expect("Failed to init Native Windows GUI");
     let app_config = AppConfig::from_env().expect("Config error - Should not happen");
-    let _ui = PShortcutsTray::build_ui(Default::default()).expect("Failed to build UI");
+    let ui_base = PShortcutsTray::new("Is this working?".to_string());
+    let _ui = PShortcutsTray::build_ui(ui_base).expect("Failed to build UI");
     // I don't think we can avoid having another thread for the
     // keyboard events:
     thread::spawn(move || bind_kb_events(app_config));
