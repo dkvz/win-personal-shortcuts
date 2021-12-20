@@ -1,4 +1,4 @@
-use std::sync::mpsc::{self, SyncSender};
+use std::sync::mpsc::{self, SyncSender, Receiver};
 use nwd::NwgUi;
 use nwg::NativeUi;
 
@@ -20,6 +20,18 @@ pub struct Notification {
   pub title: Option<String>,
   pub notification_type: NotificationType,
   pub notification_level: NotificationLevel
+}
+
+impl Default for Notification {
+  fn default() -> Self {
+    Self {
+      text: String::default(),
+      title: Some(String::from(APP_TITLE)),
+      notification_type: NotificationType::MessageBox,
+      notification_level: NotificationLevel::Info
+    }
+    
+  }
 }
 
 #[derive(Default, NwgUi)]
@@ -52,14 +64,20 @@ pub struct PShortcutsTray {
   #[nwg_events(OnMenuItemSelected: [PShortcutsTray::exit])]
   tray_item3: nwg::MenuItem,
 
-  text: String
+  notification_tx: Option<SyncSender<Notification>>,
+  notification_rx: Option<Receiver<Notification>>
 }
 
 impl PShortcutsTray {
 
-  pub fn new(text: String) -> Self {
+  pub fn new() -> Self {
+    // I had to pick a queue size, I think it errors
+    // when you try to send to a full queue. It also
+    // means the consumer doesn't work.
+    let (tx, rx) = mpsc::sync_channel::<Notification>(2);
     Self {
-      text: text,
+      notification_tx: Some(tx),
+      notification_rx: Some(rx),
       ..Default::default()
     }
   }
@@ -70,7 +88,7 @@ impl PShortcutsTray {
   }
 
   fn hello1(&self) {
-      nwg::simple_message("Hello", &self.text);
+      nwg::simple_message("Hello", "Simple messagebox");
   }
 
   fn hello2(&self) {
