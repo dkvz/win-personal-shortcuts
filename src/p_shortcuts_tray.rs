@@ -1,4 +1,6 @@
 use std::sync::mpsc::{self, SyncSender, Receiver};
+use eyre::{eyre, Result};
+use std::sync::atomic::{AtomicBool, Ordering};
 use nwd::NwgUi;
 use nwg::NativeUi;
 
@@ -34,6 +36,8 @@ impl Default for Notification {
   }
 }
 
+// Every single property has to implement Default as a requirement 
+// for using NwgUi the declarative way.
 #[derive(Default, NwgUi)]
 pub struct PShortcutsTray {
   #[nwg_control]
@@ -65,7 +69,9 @@ pub struct PShortcutsTray {
   tray_item3: nwg::MenuItem,
 
   notification_tx: Option<SyncSender<Notification>>,
-  notification_rx: Option<Receiver<Notification>>
+  notification_rx: Option<Receiver<Notification>>,
+  // AtomicBool default value is false.
+  channel_open: AtomicBool
 }
 
 impl PShortcutsTray {
@@ -82,26 +88,38 @@ impl PShortcutsTray {
     }
   }
 
+  // Returns a clone of the notification channel, if possible.
+  pub fn notification_tx(&self) -> Result<SyncSender<Notification>> {
+    if self.channel_open.load(Ordering::SeqCst) == false && self.notification_tx.is_some() {
+      // Open the channel...
+      
+    }
+    match &self.notification_tx {
+      Some(tx) => Ok(tx.clone()),
+      None => Err(eyre!("Struct has not been initialized with ::new()"))
+    }
+  }
+
   fn show_menu(&self) {
-      let (x, y) = nwg::GlobalCursor::position();
-      self.tray_menu.popup(x, y);
+    let (x, y) = nwg::GlobalCursor::position();
+    self.tray_menu.popup(x, y);
   }
 
   fn hello1(&self) {
-      nwg::simple_message("Hello", "Simple messagebox");
+    nwg::simple_message("Hello", "Simple messagebox");
   }
 
   fn hello2(&self) {
-      let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
-      self.tray.show(
-          "Hello World",
-          Some("Welcome to my application"),
-          Some(flags),
-          Some(&self.icon),
-      );
+    let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
+    self.tray.show(
+      "Hello World",
+      Some("Welcome to my application"),
+      Some(flags),
+      Some(&self.icon),
+    );
   }
 
   fn exit(&self) {
-      nwg::stop_thread_dispatch();
+    nwg::stop_thread_dispatch();
   }
 }
