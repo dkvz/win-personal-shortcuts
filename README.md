@@ -10,6 +10,13 @@ Appears in the system tray when started.
 ## Configure
 - Copy `.env.example` as `.env` and edit the variables. Backslashes have to be escaped in Windows paths.
 
+## New plan to make notifications work
+Everything has to be inside of the struct that implements NwgUI or it's just too hard.
+
+Fortunately it's possible to call an event on init that could start a thread, which is what I need.
+
+There's an example here which also includes a "self reference" (that I might not need): https://github.com/gabdube/native-windows-gui/blob/master/native-windows-gui/examples/self_referencing.rs
+
 ## Keyboard lib
 - Looks promising: https://github.com/obv-mikhail/InputBot
 
