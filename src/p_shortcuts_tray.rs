@@ -1,7 +1,26 @@
+use std::sync::mpsc::{self, SyncSender};
 use nwd::NwgUi;
 use nwg::NativeUi;
 
 pub const APP_TITLE: &'static str = "Personal Shortcuts";
+
+pub enum NotificationLevel {
+  Info,
+  Warning,
+  Error
+}
+
+pub enum NotificationType {
+  MessageBox,
+  TrayNotification
+}
+
+pub struct Notification {
+  pub text: String,
+  pub title: Option<String>,
+  pub notification_type: NotificationType,
+  pub notification_level: NotificationLevel
+}
 
 #[derive(Default, NwgUi)]
 pub struct PShortcutsTray {
