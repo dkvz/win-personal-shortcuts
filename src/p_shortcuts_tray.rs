@@ -1,6 +1,7 @@
-use std::sync::mpsc::{self, SyncSender, Receiver};
+use std::sync::mpsc::{self, Sender, Receiver};
 use eyre::{eyre, Result};
 use std::thread;
+use std::cell::RefCell;
 use crate::app_config::AppConfig;
 use crate::input_handlers::bind_kb_events;
 use std::rc::Rc;
@@ -24,6 +25,15 @@ pub struct Notification {
   pub title: Option<String>,
   pub notification_type: NotificationType,
   pub notification_level: NotificationLevel
+}
+
+pub struct Notifier {
+  tx: Sender<Notification>,
+  notice_sender: nwg::NoticeSender
+}
+
+impl Notifier {
+  // TODO
 }
 
 impl Notification {
@@ -54,9 +64,7 @@ impl Default for Notification {
 #[derive(Default, NwgUi)]
 pub struct PShortcutsTray {
   #[nwg_control]
-  #[nwg_events(
-    OnInit: [PShortcutsTray::init(SELF)]
-  )]
+  #[nwg_events(OnInit: [PShortcutsTray::init])]
   window: nwg::MessageWindow,
 
   #[nwg_resource(source_file: Some("./resources/shrimp.ico"))]
@@ -79,6 +87,12 @@ pub struct PShortcutsTray {
   #[nwg_control(parent: tray_menu, text: "Exit")]
   #[nwg_events(OnMenuItemSelected: [PShortcutsTray::exit])]
   tray_item3: nwg::MenuItem,
+
+  #[nwg_control]
+  #[nwg_events(OnNotice: [PShortcutsTray::notify_event])]
+  notify_event: nwg::Notice,
+
+  notification_rx: RefCell<Option<Receiver<Notification>>>
 }
 
 impl PShortcutsTray {
@@ -92,7 +106,7 @@ impl PShortcutsTray {
     }
   }*/
 
-  fn init(app: &'static PShortcutsTray) {
+  fn init(&self) {
     let app_config = AppConfig::from_env()
       .expect("Config error - Should not happen");
 
@@ -100,26 +114,29 @@ impl PShortcutsTray {
     // I had to pick a queue size, I think it errors
     // when you try to send to a full queue. It also
     // means the consumer doesn't work.
-    let (tx, rx) = mpsc::sync_channel::<Notification>(2);
+    let (tx, rx) = mpsc::channel::<Notification>();
+    
+    let notice_sender = self.notify_event.sender();
 
     // I don't think we can avoid having another thread for the
     // keyboard events.
     // I could clone tx but I only have one.
-    //thread::spawn(move || bind_kb_events(app_config, tx));
+    thread::spawn(move || bind_kb_events(app_config, tx));
 
-    nwg::dispatch_thread_events_with_callback(move || loop {
-      match rx.recv() {
-        Ok(notif) => {
-          let _ = app.notify(notif);
-        },
-        Err(_) => panic!("Notification channel failed")
-      }
-    });
+    *self.notification_rx.borrow_mut() = Some(rx);
   }
 
   fn show_menu(&self) {
     let (x, y) = nwg::GlobalCursor::position();
     self.tray_menu.popup(x, y);
+  }
+
+  fn notify_event(&self) {
+    let mut rx_ref = self.notification_rx.borrow_mut();
+    let rx = rx_ref.as_mut().expect("Notification channel is down");
+    while let Ok(msg) = rx.try_recv() {
+      self.notify(msg);
+    }
   }
 
   // The "MessageChoice" should always be OK.
