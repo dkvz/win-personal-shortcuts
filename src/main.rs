@@ -17,7 +17,7 @@ fn main() -> Result<()> {
         .expect("Failed to build UI");
     
     // This will block the main thread:
-    //nwg::dispatch_thread_events();
+    nwg::dispatch_thread_events();
 
     Ok(())
 }

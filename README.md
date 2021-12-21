@@ -17,6 +17,9 @@ Fortunately it's possible to call an event on init that could start a thread, wh
 
 There's an example here which also includes a "self reference" (that I might not need): https://github.com/gabdube/native-windows-gui/blob/master/native-windows-gui/examples/self_referencing.rs
 
+Actually this is much closer to what I want to do: 
+https://github.com/gabdube/native-windows-gui/issues/232
+
 ## Keyboard lib
 - Looks promising: https://github.com/obv-mikhail/InputBot
 

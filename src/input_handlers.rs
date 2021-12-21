@@ -1,13 +1,13 @@
 use inputbot::{KeybdKey::*, *};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
-use std::sync::mpsc::SyncSender;
+use std::sync::mpsc::Sender;
 use eyre::{eyre, Result};
 //use std::{thread::sleep, time::Duration};
 use crate::app_config::AppConfig;
 use crate::p_shortcuts_tray::Notification;
 use std::process::Command;
 
-pub fn bind_kb_events(app_config: AppConfig, notification_tx: SyncSender<Notification>) {
+pub fn bind_kb_events(app_config: AppConfig, notification_tx: Sender<Notification>) {
   // The closures from inputbot are not
   // FnMut so the only way to have some
   // kind of state is to use something
@@ -15,7 +15,7 @@ pub fn bind_kb_events(app_config: AppConfig, notification_tx: SyncSender<Notific
   let is_locked = AtomicBool::new(false);
   let obs_pid = AtomicU32::new(0);
 
-  notification_tx.try_send(
+  notification_tx.send(
     Notification::info_box(String::from("It works"))
   ).expect("Could not send example message");
 
