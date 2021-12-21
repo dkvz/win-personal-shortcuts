@@ -25,5 +25,15 @@ Example using winapi.
 - Easier messageboxes: https://github.com/bekker/msgbox-rs
 - Actually I'm just gonna run from system tray: https://github.com/gabdube/native-windows-gui/blob/master/native-windows-gui/examples/system_tray_d.rs
 
+## New plan to make notifications work
+Everything has to be inside of the struct that implements NwgUI or it's just too hard.
+
+Fortunately it's possible to call an event on init that could start a thread, which is what I need.
+
+There's an example here which also includes a "self reference" (that I might not need): https://github.com/gabdube/native-windows-gui/blob/master/native-windows-gui/examples/self_referencing.rs
+
+Actually this is much closer to what I want to do: 
+https://github.com/gabdube/native-windows-gui/issues/232
+
 # TODO
 - [] Uncomment the windows subsystem thingy in main.rs.

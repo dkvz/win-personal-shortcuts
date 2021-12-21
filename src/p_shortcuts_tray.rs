@@ -1,11 +1,90 @@
+use std::sync::mpsc::{self, Sender, Receiver};
+use eyre::{eyre, Result};
+use std::thread;
+use std::cell::RefCell;
+use crate::app_config::AppConfig;
+use crate::input_handlers::bind_kb_events;
+use std::rc::Rc;
 use nwd::NwgUi;
 use nwg::NativeUi;
 
 pub const APP_TITLE: &'static str = "Personal Shortcuts";
 
+pub enum NotificationLevel {
+  Info,
+  Error
+}
+
+pub enum NotificationType {
+  MessageBox,
+  TrayNotification
+}
+
+pub struct Notification {
+  pub text: String,
+  pub title: Option<String>,
+  pub notification_type: NotificationType,
+  pub notification_level: NotificationLevel
+}
+
+pub struct Notifier {
+  tx: Sender<Notification>,
+  notice_sender: nwg::NoticeSender
+}
+
+impl Notifier {
+  pub fn new(
+    tx: Sender<Notification>, 
+    notice_sender: nwg::NoticeSender
+  ) -> Self {
+    Self {
+      tx,
+      notice_sender
+    }
+  }
+
+  pub fn info_box(&self, msg: String) {
+    let notif = Notification::info_box(msg);
+    self.send_notification(notif)
+  }
+
+  fn send_notification(&self, notif: Notification) {
+    match self.tx.send(notif) {
+      Err(_) => eprintln!("Could not send notification"),
+      _ => self.notice_sender.notice()
+    }
+  }
+}
+
+impl Notification {
+  pub fn info_box(msg: String) -> Self {
+    Self {
+      text: msg,
+      title: None,
+      notification_level: NotificationLevel::Info,
+      notification_type: NotificationType::MessageBox
+    }
+  }
+}
+
+impl Default for Notification {
+  fn default() -> Self {
+    Self {
+      text: String::default(),
+      title: Some(String::from(APP_TITLE)),
+      notification_type: NotificationType::MessageBox,
+      notification_level: NotificationLevel::Info
+    }
+    
+  }
+}
+
+// Every single property has to implement Default as a requirement 
+// for using NwgUi the declarative way.
 #[derive(Default, NwgUi)]
 pub struct PShortcutsTray {
   #[nwg_control]
+  #[nwg_events(OnInit: [PShortcutsTray::init])]
   window: nwg::MessageWindow,
 
   #[nwg_resource(source_file: Some("./resources/shrimp.ico"))]
@@ -21,10 +100,6 @@ pub struct PShortcutsTray {
   #[nwg_control(parent: window, popup: true)]
   tray_menu: nwg::Menu,
 
-  #[nwg_control(parent: tray_menu, text: "Hello")]
-  #[nwg_events(OnMenuItemSelected: [PShortcutsTray::hello1])]
-  tray_item1: nwg::MenuItem,
-
   #[nwg_control(parent: tray_menu, text: "Popup")]
   #[nwg_events(OnMenuItemSelected: [PShortcutsTray::hello2])]
   tray_item2: nwg::MenuItem,
@@ -32,29 +107,80 @@ pub struct PShortcutsTray {
   #[nwg_control(parent: tray_menu, text: "Exit")]
   #[nwg_events(OnMenuItemSelected: [PShortcutsTray::exit])]
   tray_item3: nwg::MenuItem,
+
+  #[nwg_control]
+  #[nwg_events(OnNotice: [PShortcutsTray::notify_event])]
+  notify_event: nwg::Notice,
+
+  notification_rx: RefCell<Option<Receiver<Notification>>>
 }
 
 impl PShortcutsTray {
-  fn show_menu(&self) {
-      let (x, y) = nwg::GlobalCursor::position();
-      self.tray_menu.popup(x, y);
+
+  /*pub fn new() -> Self {
+    let (tx, rx) = mpsc::sync_channel::<Notification>(2);
+    Self {
+      notification_tx: Some(tx),
+      notification_rx: Some(rx),
+      ..Default::default()
+    }
+  }*/
+
+  fn init(&self) {
+    let app_config = AppConfig::from_env()
+      .expect("Config error - Should not happen");
+
+    // Open the notification channel.
+    let (tx, rx) = mpsc::channel::<Notification>();
+    // I could clone tx but I only have one.
+    let notifier = Notifier::new(tx, self.notify_event.sender());
+    
+    // I don't think we can avoid having another thread for the
+    // keyboard events.
+    thread::spawn(move || bind_kb_events(app_config, notifier));
+
+    *self.notification_rx.borrow_mut() = Some(rx);
   }
 
-  fn hello1(&self) {
-      nwg::simple_message("Hello", "Hello World!");
+  fn show_menu(&self) {
+    let (x, y) = nwg::GlobalCursor::position();
+    self.tray_menu.popup(x, y);
+  }
+
+  fn notify_event(&self) {
+    let mut rx_ref = self.notification_rx.borrow_mut();
+    let rx = rx_ref.as_mut().expect("Notification channel is down");
+    while let Ok(msg) = rx.try_recv() {
+      self.notify(msg);
+    }
+  }
+
+  // The "MessageChoice" should always be OK.
+  fn notify(&self, msg: Notification) -> nwg::MessageChoice {
+    let title = msg.title.unwrap_or(String::from(APP_TITLE));
+    match msg.notification_level {
+      NotificationLevel::Info => nwg::simple_message(
+        &title,
+        &msg.text
+      ),
+      NotificationLevel::Error => nwg::error_message(
+        &title, 
+        &msg.text
+      )
+    }
   }
 
   fn hello2(&self) {
-      let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
-      self.tray.show(
-          "Hello World",
-          Some("Welcome to my application"),
-          Some(flags),
-          Some(&self.icon),
-      );
+    let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
+    self.tray.show(
+      "Hello World",
+      Some("Welcome to my application"),
+      Some(flags),
+      Some(&self.icon),
+    );
   }
 
   fn exit(&self) {
-      nwg::stop_thread_dispatch();
+    nwg::stop_thread_dispatch();
   }
 }
