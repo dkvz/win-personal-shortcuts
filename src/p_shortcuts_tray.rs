@@ -33,7 +33,27 @@ pub struct Notifier {
 }
 
 impl Notifier {
-  // TODO
+  pub fn new(
+    tx: Sender<Notification>, 
+    notice_sender: nwg::NoticeSender
+  ) -> Self {
+    Self {
+      tx,
+      notice_sender
+    }
+  }
+
+  pub fn info_box(&self, msg: String) {
+    let notif = Notification::info_box(msg);
+    self.send_notification(notif)
+  }
+
+  fn send_notification(&self, notif: Notification) {
+    match self.tx.send(notif) {
+      Err(_) => eprintln!("Could not send notification"),
+      _ => self.notice_sender.notice()
+    }
+  }
 }
 
 impl Notification {
@@ -111,17 +131,13 @@ impl PShortcutsTray {
       .expect("Config error - Should not happen");
 
     // Open the notification channel.
-    // I had to pick a queue size, I think it errors
-    // when you try to send to a full queue. It also
-    // means the consumer doesn't work.
     let (tx, rx) = mpsc::channel::<Notification>();
+    // I could clone tx but I only have one.
+    let notifier = Notifier::new(tx, self.notify_event.sender());
     
-    let notice_sender = self.notify_event.sender();
-
     // I don't think we can avoid having another thread for the
     // keyboard events.
-    // I could clone tx but I only have one.
-    thread::spawn(move || bind_kb_events(app_config, tx));
+    thread::spawn(move || bind_kb_events(app_config, notifier));
 
     *self.notification_rx.borrow_mut() = Some(rx);
   }
