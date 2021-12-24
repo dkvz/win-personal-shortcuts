@@ -5,6 +5,7 @@ mod p_shortcuts_tray;
 use p_shortcuts_tray::PShortcutsTray;
 mod input_handlers;
 mod app_config;
+mod notifications;
 use dotenv::dotenv;
 use eyre::Result;
 

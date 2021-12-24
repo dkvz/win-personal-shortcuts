@@ -2,7 +2,7 @@ use inputbot::{KeybdKey::*, *};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 //use std::{thread::sleep, time::Duration};
 use crate::app_config::AppConfig;
-use crate::p_shortcuts_tray::{Notification, Notifier};
+use crate::notifications::{Notification, Notifier};
 use std::process::Command;
 
 pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
