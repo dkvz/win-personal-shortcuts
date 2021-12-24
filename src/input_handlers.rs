@@ -13,11 +13,10 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
   let is_locked = AtomicBool::new(false);
   let obs_pid = AtomicU32::new(0);
 
-  notifier.info_box(String::from("It's working!"));
+  notifier.info_box(String::from("Is this still working??"));
 
   ScrollLockKey.bind(move || {
     if ScrollLockKey.is_toggled() && is_locked.load(Ordering::SeqCst) == false {
-      println!("Scrolllock enabled, OBS path: {}", app_config.obs_path);
       is_locked.store(true, Ordering::SeqCst);
       match Command::new(format!("{}\\{}", &app_config.obs_path, &app_config.obs_exe))
         .current_dir(&app_config.obs_path)
@@ -32,7 +31,7 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
         }
         Err(e) => {
           is_locked.store(false, Ordering::SeqCst);
-          println!("Could not start OBS: {}", e);
+          notifier.info_box(format!("Could not start OBS: {}", e));
         }
       }
     } else if is_locked.load(Ordering::SeqCst) == true {

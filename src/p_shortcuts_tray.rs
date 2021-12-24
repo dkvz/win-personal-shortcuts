@@ -1,4 +1,4 @@
-use std::sync::mpsc::{self, Sender, Receiver};
+use std::sync::mpsc::{self, SyncSender, Receiver};
 use eyre::{eyre, Result};
 use std::thread;
 use std::cell::RefCell;
@@ -28,13 +28,13 @@ pub struct Notification {
 }
 
 pub struct Notifier {
-  tx: Sender<Notification>,
+  tx: SyncSender<Notification>,
   notice_sender: nwg::NoticeSender
 }
 
 impl Notifier {
   pub fn new(
-    tx: Sender<Notification>, 
+    tx: SyncSender<Notification>, 
     notice_sender: nwg::NoticeSender
   ) -> Self {
     Self {
@@ -49,7 +49,7 @@ impl Notifier {
   }
 
   fn send_notification(&self, notif: Notification) {
-    match self.tx.send(notif) {
+    match self.tx.try_send(notif) {
       Err(_) => eprintln!("Could not send notification"),
       _ => self.notice_sender.notice()
     }
@@ -130,8 +130,11 @@ impl PShortcutsTray {
     let app_config = AppConfig::from_env()
       .expect("Config error - Should not happen");
 
-    // Open the notification channel.
-    let (tx, rx) = mpsc::channel::<Notification>();
+    // Open the notification channel. We need it to implement Sync 
+    // because of how the input handler works.
+    // Had to pick an arbitrary queue size. I assume even 1 should
+    // work with no error.
+    let (tx, rx) = mpsc::sync_channel::<Notification>(2);
     // I could clone tx but I only have one.
     let notifier = Notifier::new(tx, self.notify_event.sender());
     
