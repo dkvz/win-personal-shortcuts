@@ -39,6 +39,11 @@ impl Notifier {
     self.send_notification(notif)
   }
 
+  pub fn error_box(&self, msg: String) {
+    let notif = Notification::error_box(msg);
+    self.send_notification(notif)
+  }
+
   fn send_notification(&self, notif: Notification) {
     match self.tx.try_send(notif) {
       Err(_) => eprintln!("Could not send notification"),
@@ -53,6 +58,15 @@ impl Notification {
       text: msg,
       title: None,
       notification_level: NotificationLevel::Info,
+      notification_type: NotificationType::MessageBox
+    }
+  }
+
+  pub fn error_box(msg: String) -> Self {
+    Self {
+      text: msg,
+      title: None,
+      notification_level: NotificationLevel::Error,
       notification_type: NotificationType::MessageBox
     }
   }

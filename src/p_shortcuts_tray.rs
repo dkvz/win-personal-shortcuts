@@ -90,18 +90,33 @@ impl PShortcutsTray {
   }
 
   // The "MessageChoice" should always be OK.
-  fn notify(&self, msg: Notification) -> nwg::MessageChoice {
+  fn notify(&self, msg: Notification) {
     let title = msg.title.unwrap_or(String::from(APP_TITLE));
-    match msg.notification_level {
-      NotificationLevel::Info => nwg::simple_message(
-        &title,
-        &msg.text
-      ),
-      NotificationLevel::Error => nwg::error_message(
-        &title, 
-        &msg.text
-      )
+    match msg.notification_type {
+      NotificationType::MessageBox => {
+        // We don't care about the response to the dialog:
+        let _ = match msg.notification_level {
+          NotificationLevel::Info => nwg::simple_message(
+            &title,
+            &msg.text
+          ),
+          NotificationLevel::Error => nwg::error_message(
+            &title, 
+            &msg.text
+          )
+        };
+      },
+      NotificationType::TrayNotification => {
+        let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
+        self.tray.show(
+          &msg.text,
+          msg.title.map(|t| &t).unwrap_or(None),
+          Some(flags),
+          Some(&self.icon),
+        );
+      }
     }
+    
   }
 
   fn hello2(&self) {
