@@ -2,7 +2,7 @@ use inputbot::{KeybdKey::*, *};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 //use std::{thread::sleep, time::Duration};
 use crate::app_config::AppConfig;
-use crate::notifications::{Notification, Notifier};
+use crate::notifications::Notifier;
 use std::process::Command;
 
 pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
@@ -12,8 +12,6 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
   // that implements "sync". I think.
   let is_locked = AtomicBool::new(false);
   let obs_pid = AtomicU32::new(0);
-
-  notifier.info_box(String::from("Is this still working??"));
 
   ScrollLockKey.bind(move || {
     if ScrollLockKey.is_toggled() && is_locked.load(Ordering::SeqCst) == false {
@@ -31,7 +29,7 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
         }
         Err(e) => {
           is_locked.store(false, Ordering::SeqCst);
-          notifier.info_box(format!("Could not start OBS: {}", e));
+          notifier.error_box(format!("Could not start OBS: {}", e));
         }
       }
     } else if is_locked.load(Ordering::SeqCst) == true {
@@ -57,10 +55,10 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
           } else {
             let err_output = String::from_utf8(output.stderr)
               .unwrap_or(String::from("Could not parse error message"));
-            println!("Could not kill OBS: {}", err_output);
+            notifier.error_box(format!("Could not kill OBS: {}", err_output));
           }
         }
-        Err(e) => println!("Could not spawn taskkill: {}", e),
+        Err(e) => notifier.error_box(format!("Could not spawn taskkill: {}", e))
       }
     }
   });
