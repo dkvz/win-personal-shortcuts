@@ -31,9 +31,9 @@ pub struct PShortcutsTray {
   #[nwg_control(parent: window, popup: true)]
   tray_menu: nwg::Menu,
 
-  #[nwg_control(parent: tray_menu, text: "Popup")]
+  /*#[nwg_control(parent: tray_menu, text: "Popup")]
   #[nwg_events(OnMenuItemSelected: [PShortcutsTray::hello2])]
-  tray_item2: nwg::MenuItem,
+  tray_item2: nwg::MenuItem,*/
 
   #[nwg_control(parent: tray_menu, text: "Exit")]
   #[nwg_events(OnMenuItemSelected: [PShortcutsTray::exit])]
@@ -91,9 +91,9 @@ impl PShortcutsTray {
 
   // The "MessageChoice" should always be OK.
   fn notify(&self, msg: Notification) {
-    let title = msg.title.unwrap_or(String::from(APP_TITLE));
     match msg.notification_type {
       NotificationType::MessageBox => {
+        let title = msg.title.unwrap_or(String::from(APP_TITLE));
         // We don't care about the response to the dialog:
         let _ = match msg.notification_level {
           NotificationLevel::Info => nwg::simple_message(
@@ -107,26 +107,20 @@ impl PShortcutsTray {
         };
       },
       NotificationType::TrayNotification => {
+        let title = match &msg.title {
+          Some(t) => Some(t.as_ref()),
+          _ => None
+        };
         let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
         self.tray.show(
           &msg.text,
-          msg.title.map(|t| &t).unwrap_or(None),
+          title,
           Some(flags),
           Some(&self.icon),
         );
       }
     }
     
-  }
-
-  fn hello2(&self) {
-    let flags = nwg::TrayNotificationFlags::USER_ICON | nwg::TrayNotificationFlags::LARGE_ICON;
-    self.tray.show(
-      "Hello World",
-      Some("Welcome to my application"),
-      Some(flags),
-      Some(&self.icon),
-    );
   }
 
   fn exit(&self) {

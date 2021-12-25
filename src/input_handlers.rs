@@ -48,7 +48,10 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
       {
         Ok(output) => {
           if output.status.success() {
-            println!("Recording ended.");
+            notifier.tray_notification(
+              Some("Recording successful".to_string()),
+              "Recording ended successfully".to_string(),
+            );
             // Re-initalize everything:
             obs_pid.store(0, Ordering::SeqCst);
             is_locked.store(false, Ordering::SeqCst);
@@ -58,7 +61,7 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
             notifier.error_box(format!("Could not kill OBS: {}", err_output));
           }
         }
-        Err(e) => notifier.error_box(format!("Could not spawn taskkill: {}", e))
+        Err(e) => notifier.error_box(format!("Could not spawn taskkill: {}", e)),
       }
     }
   });
