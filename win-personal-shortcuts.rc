@@ -1,0 +1,3 @@
+#define RT_MANIFEST 24
+1 RT_MANIFEST "win-personal-shortcuts.exe.manifest"
+MAINICON ICON "resources\shrimp.ico"
