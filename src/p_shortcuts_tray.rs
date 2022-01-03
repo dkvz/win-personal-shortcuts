@@ -10,6 +10,10 @@ use nwg::NativeUi;
 
 pub const APP_TITLE: &'static str = "Personal Shortcuts";
 
+// Loading the icon as binary data to make sure it gets included
+// in the executable:
+const MAIN_ICON: &[u8] = include_bytes!("../resources/shrimp.ico");
+
 // Every single property has to implement Default as a requirement 
 // for using NwgUi the declarative way.
 #[derive(Default, NwgUi)]
@@ -18,7 +22,8 @@ pub struct PShortcutsTray {
   #[nwg_events(OnInit: [PShortcutsTray::init])]
   window: nwg::MessageWindow,
 
-  #[nwg_resource(source_file: Some("./resources/shrimp.ico"))]
+  //#[nwg_resource(source_file: Some("./resources/shrimp.ico"))]
+  #[nwg_resource(source_bin: Some(MAIN_ICON))]
   icon: nwg::Icon,
 
   #[nwg_control(icon: Some(&data.icon), tip: Some(APP_TITLE))]

@@ -36,4 +36,5 @@ Actually this is much closer to what I want to do:
 https://github.com/gabdube/native-windows-gui/issues/232
 
 # TODO
-- [] Uncomment the windows subsystem thingy in main.rs.
+- [x] Uncomment the windows subsystem thingy in main.rs.
+- [] Rebrand this project to that it's linked more closely to its purpose of replacing ShadowPlay.
