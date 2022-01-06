@@ -35,6 +35,9 @@ There's an example here which also includes a "self reference" (that I might not
 Actually this is much closer to what I want to do: 
 https://github.com/gabdube/native-windows-gui/issues/232
 
+## Adding icon to the exe
+This only seems to work with the Visual Studio compiler. However I had the manifest set to require admin privileges so that may have been the issue, it's now commented out so we get a regular user level executable.
+
 # TODO
 - [x] Uncomment the windows subsystem thingy in main.rs.
 - [] Rebrand this project to that it's linked more closely to its purpose of replacing ShadowPlay.
