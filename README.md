@@ -10,6 +10,11 @@ Appears in the system tray when started.
 ## Configure
 - Copy `.env.example` as `.env` and edit the variables. Backslashes have to be escaped in Windows paths.
 
+## Building
+Embedding the resources (well, just the one icon) requires having "windres.exe" which I think is part of the MSVC toolchain.
+
+When using the GNU compiler like I do, you have to download MinGW64 and add the bin folder of it in your PATH.
+
 ## Keyboard lib
 - Looks promising: https://github.com/obv-mikhail/InputBot
 
