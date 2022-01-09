@@ -12,7 +12,9 @@ pub const APP_TITLE: &'static str = "Personal Shortcuts";
 
 // Loading the icon as binary data to make sure it gets included
 // in the executable:
-const MAIN_ICON: &[u8] = include_bytes!("../resources/shrimp.ico");
+// I switched to using it from the embedded resources since it's
+// being loaded there anyway.
+//const MAIN_ICON: &[u8] = include_bytes!("../resources/shrimp.ico");
 
 // Every single property has to implement Default as a requirement 
 // for using NwgUi the declarative way.
@@ -23,7 +25,12 @@ pub struct PShortcutsTray {
   window: nwg::MessageWindow,
 
   //#[nwg_resource(source_file: Some("./resources/shrimp.ico"))]
-  #[nwg_resource(source_bin: Some(MAIN_ICON))]
+  //#[nwg_resource(source_bin: Some(MAIN_ICON))]
+  // In the end, loading from resources:
+  #[nwg_resource]
+  embed: nwg::EmbedResource,
+  
+  #[nwg_resource(source_embed: Some(&data.embed), source_embed_str: Some("MAINICON"))]
   icon: nwg::Icon,
 
   #[nwg_control(icon: Some(&data.icon), tip: Some(APP_TITLE))]

@@ -45,5 +45,5 @@ This only seems to work with the Visual Studio compiler. However I had the manif
 
 # TODO
 - [x] Uncomment the windows subsystem thingy in main.rs.
-- [] Load the notification icon from resources inside p_shortcuts_tray since I'm now using resources anyway.
+- [x] Load the notification icon from resources inside p_shortcuts_tray since I'm now using resources anyway.
 - [] Rebrand this project to that it's linked more closely to its purpose of replacing ShadowPlay.
