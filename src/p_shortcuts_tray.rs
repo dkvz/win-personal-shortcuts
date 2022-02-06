@@ -6,7 +6,7 @@ use crate::app_config::AppConfig;
 use crate::input_handlers::bind_kb_events;
 use crate::notifications::*;
 use nwd::NwgUi;
-use nwg::NativeUi;
+//use nwg::NativeUi;
 
 pub const APP_TITLE: &'static str = "Personal Shortcuts";
 
