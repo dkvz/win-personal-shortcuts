@@ -44,6 +44,9 @@ https://github.com/gabdube/native-windows-gui/issues/232
 This only seems to work with the Visual Studio compiler. However I had the manifest set to require admin privileges so that may have been the issue, it's now commented out so we get a regular user level executable.
 
 # TODO
+- [ ] Rebrand this project to that it's linked more closely to its purpose of replacing ShadowPlay.
+- [ ] Add a config option to disable notifications completely.
+- [ ] Allow configuring an alternate key to ScrLk, which would probably be a weird key like "-" and check for Ctrl.
+- [ ] We could have some option to run a post-treatment (using ffmpeg) on the captured video.
 - [x] Uncomment the windows subsystem thingy in main.rs.
 - [x] Load the notification icon from resources inside p_shortcuts_tray since I'm now using resources anyway.
-- [] Rebrand this project to that it's linked more closely to its purpose of replacing ShadowPlay.
