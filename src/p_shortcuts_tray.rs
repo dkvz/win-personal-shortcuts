@@ -95,7 +95,12 @@ impl PShortcutsTray {
     let mut rx_ref = self.notification_rx.borrow_mut();
     let rx = rx_ref.as_mut().expect("Notification channel is down");
     while let Ok(msg) = rx.try_recv() {
-      self.notify(msg);
+      // Don't notify if it's disabled by config and notification
+      // isn't an error:
+      match (self.app_config.disable_notifications, &msg.notification_level) {
+        (true, NotificationLevel::Info) => (),
+        (_, _) => self.notify(msg)
+      }
     }
   }
 

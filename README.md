@@ -5,13 +5,24 @@ Meant to associate keyboard events to running or stopping things.
 
 The main use case is to replace the Nvidia ShadowPlay start & stop recording with this and OBS Studio and I should probably rename the project to reflect that.
 
-Appears in the system tray when started.
+Appears in the system tray when started. For the moment with a strange shrimp icon sorry about that.
 
 ## Releases
 I should be providing compiled executables in the [Releases section](https://github.com/dkvz/win-personal-shortcuts/releases), alongside an example .env file, if I don't forget about that.
 
 ## Configure
 - Copy `.env.example` as `.env` and edit the variables. Backslashes have to be escaped in Windows paths.
+
+## How to use
+- Install OBS Studio
+- Configure a profile for recording (default options expect it to be called "Recording")
+  + I may document the OBS config later.
+
+- Put the exe and your .env in a directory
+- Run the program, it should appear in the task bar
+- You can now use Scroll Lock to enable and disable the recording
+
+**Some laptops don't have ScrLck on the keyboard but it should be available through Fn+C or Fn+K**.
 
 ## Building
 Embedding the resources (well, just the one icon) requires having "windres.exe" which I think is part of the MSVC toolchain.
@@ -48,7 +59,7 @@ This only seems to work with the Visual Studio compiler. However I had the manif
 
 # TODO
 - [ ] Rebrand this project to that it's linked more closely to its purpose of replacing ShadowPlay.
-- [ ] Add a config option to disable notifications completely.
+- [x] Add a config option to disable notifications completely except for errors.
 - [ ] Add a checkbox in the tray menu to be able to disable or enable notifications.
 - [ ] Allow configuring an alternate key to ScrLk, which would probably be a weird key like "-" and check for Ctrl.
 - [ ] We could have some option to run a post-treatment (using ffmpeg) on the captured video.
