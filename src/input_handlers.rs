@@ -29,7 +29,10 @@ pub fn bind_kb_events(app_config: AppConfig, notifier: Notifier) {
         }
         Err(e) => {
           is_locked.store(false, Ordering::SeqCst);
-          notifier.error_box(format!("Could not start OBS: {}", e));
+          notifier.error_box(format!(
+            "Could not start OBS at path {} - {}",
+            &app_config.obs_path, e
+          ));
         }
       }
     } else if is_locked.load(Ordering::SeqCst) == true {

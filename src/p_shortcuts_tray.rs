@@ -55,24 +55,21 @@ pub struct PShortcutsTray {
   #[nwg_events(OnNotice: [PShortcutsTray::notify_event])]
   notify_event: nwg::Notice,
 
-  notification_rx: RefCell<Option<Receiver<Notification>>>
+  notification_rx: RefCell<Option<Receiver<Notification>>>,
+
+  app_config: AppConfig
 }
 
 impl PShortcutsTray {
 
-  /*pub fn new() -> Self {
-    let (tx, rx) = mpsc::sync_channel::<Notification>(2);
+  pub fn new(app_config: AppConfig) -> Self {
     Self {
-      notification_tx: Some(tx),
-      notification_rx: Some(rx),
+      app_config,
       ..Default::default()
     }
-  }*/
+  }
 
   fn init(&self) {
-    let app_config = AppConfig::from_env()
-      .expect("Config error - Should not happen");
-
     // Open the notification channel. We need it to implement Sync 
     // because of how the input handler works.
     // Had to pick an arbitrary queue size. I assume even 1 should
@@ -83,7 +80,8 @@ impl PShortcutsTray {
     
     // I don't think we can avoid having another thread for the
     // keyboard events.
-    thread::spawn(move || bind_kb_events(app_config, notifier));
+    let config = self.app_config.clone();
+    thread::spawn(move || bind_kb_events(config, notifier));
 
     *self.notification_rx.borrow_mut() = Some(rx);
   }

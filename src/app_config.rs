@@ -4,7 +4,7 @@ use std::default::Default;
 
 // AppConfig is a property of the "ui" struct
 // Hence needs to implement Default
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Default, Clone)]
 pub struct AppConfig {
   pub obs_path: String,
   pub obs_exe: String,
