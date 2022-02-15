@@ -14,6 +14,10 @@ pub struct KbEvents {
   thread_handle: Option<JoinHandle<()>>,
 }
 
+// TODO: Should be moved elsewhere, I need a module to handle all the
+// process spawning and killing at some point.
+fn kill_pid(pid: u32) {}
+
 impl KbEvents {
   pub fn new(app_config: AppConfig, notifier: Notifier) -> Self {
     Self {
