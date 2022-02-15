@@ -19,8 +19,8 @@ pub struct KbEvents {
 // TODO: Should be moved elsewhere, I need a module to handle all the
 // process spawning and killing at some point.
 fn kill_pid(pid: u32) -> Result<(), String> {
-  match Command::new("cmd")
-    .args(&["/C", "taskkill", "/F", "/PID", &pid.to_string()])
+  match Command::new("taskkill")
+    .args(&["/F", "/PID", &pid.to_string()])
     .output()
   {
     Ok(output) => {
