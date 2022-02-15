@@ -16,7 +16,23 @@ pub struct KbEvents {
 
 // TODO: Should be moved elsewhere, I need a module to handle all the
 // process spawning and killing at some point.
-fn kill_pid(pid: u32) {}
+fn kill_pid(pid: u32) -> Result<(), String> {
+  match Command::new("cmd")
+    .args(&["/C", "taskkill", "/F", "/PID", &pid.to_string()])
+    .output()
+  {
+    Ok(output) => {
+      if output.status.success() {
+        Ok(())
+      } else {
+        let err_output =
+          String::from_utf8(output.stderr).unwrap_or(String::from("Could not parse error message"));
+        Err(format!("Could not kill OBS: {}", err_output))
+      }
+    }
+    Err(e) => Err(format!("Could not spawn taskkill: {}", e)),
+  }
+}
 
 impl KbEvents {
   pub fn new(app_config: AppConfig, notifier: Notifier) -> Self {
@@ -63,32 +79,19 @@ impl KbEvents {
         // Always check that something is actually
         // running before trying disable anything.
         // Kill the task:
-        match Command::new("cmd")
-          .args(&[
-            "/C",
-            "taskkill",
-            "/F",
-            "/PID",
-            &obs_pid.load(Ordering::SeqCst).to_string(),
-          ])
-          .output()
-        {
-          Ok(output) => {
-            if output.status.success() {
-              notifier.tray_notification(
-                Some("Recording successful".to_string()),
-                "Recording ended successfully".to_string(),
-              );
-              // Re-initalize everything:
-              obs_pid.store(0, Ordering::SeqCst);
-              is_locked.store(false, Ordering::SeqCst);
-            } else {
-              let err_output = String::from_utf8(output.stderr)
-                .unwrap_or(String::from("Could not parse error message"));
-              notifier.error_box(format!("Could not kill OBS: {}", err_output));
-            }
+        match kill_pid(obs_pid.load(Ordering::SeqCst)) {
+          Ok(_) => {
+            notifier.tray_notification(
+              Some("Recording successful".to_string()),
+              "Recording ended successfully".to_string(),
+            );
+            // Re-initalize everything:
+            obs_pid.store(0, Ordering::SeqCst);
+            is_locked.store(false, Ordering::SeqCst);
           }
-          Err(e) => notifier.error_box(format!("Could not spawn taskkill: {}", e)),
+          Err(msg) => {
+            notifier.error_box(msg);
+          }
         }
       }
 
