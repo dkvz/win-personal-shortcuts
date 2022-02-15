@@ -3,8 +3,8 @@ use eyre::{eyre, Result};
 use std::thread;
 use std::cell::RefCell;
 use crate::app_config::AppConfig;
-use crate::input_handlers::bind_kb_events;
 use crate::notifications::*;
+use crate::kb_events::KbEvents;
 use nwd::NwgUi;
 //use nwg::NativeUi;
 
@@ -57,6 +57,8 @@ pub struct PShortcutsTray {
 
   notification_rx: RefCell<Option<Receiver<Notification>>>,
 
+  kb_events: RefCell<Option<KbEvents>>,
+
   app_config: AppConfig
 }
 
@@ -81,9 +83,11 @@ impl PShortcutsTray {
     // I don't think we can avoid having another thread for the
     // keyboard events.
     let config = self.app_config.clone();
-    thread::spawn(move || bind_kb_events(config, notifier));
+
+    let kb_events = KbEvents::new(config, notifier).start();
 
     *self.notification_rx.borrow_mut() = Some(rx);
+    *self.kb_events.borrow_mut() = Some(kb_events);
   }
 
   fn show_menu(&self) {

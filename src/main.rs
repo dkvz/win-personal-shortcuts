@@ -5,7 +5,6 @@ mod p_shortcuts_tray;
 use p_shortcuts_tray::PShortcutsTray;
 mod app_config;
 use app_config::AppConfig;
-mod input_handlers;
 mod kb_events;
 mod notifications;
 use dotenv::dotenv;
