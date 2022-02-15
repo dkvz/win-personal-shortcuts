@@ -80,7 +80,15 @@ impl KbEvents {
           // Always check that something is actually
           // running before trying disable anything.
           // Kill the task:
-          match kill_pid(obs_pid.load(Ordering::SeqCst)) {
+          let pid = obs_pid.load(Ordering::SeqCst);
+          if pid == 0 {
+            // Shouldn't happen.
+            notifier.error_box(
+              "Missing OBS process ID, you may have to kill the process manually.".to_string(),
+            );
+            return;
+          }
+          match kill_pid(pid) {
             Ok(_) => {
               notifier.tray_notification(
                 Some("Recording successful".to_string()),
