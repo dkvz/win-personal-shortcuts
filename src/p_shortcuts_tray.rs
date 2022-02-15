@@ -144,7 +144,9 @@ impl PShortcutsTray {
 
   fn exit(&self) {
     // Will get called on normal kill signal or manually exiting.
-    
+    if let Some(kb_events) = self.kb_events.borrow_mut().as_mut() {
+      kb_events.stop();
+    }
     nwg::stop_thread_dispatch();
   }
 }

@@ -11,6 +11,8 @@ pub struct KbEvents {
   notifier: Arc<Notifier>,
   is_locked: Arc<AtomicBool>,
   obs_pid: Arc<AtomicU32>,
+  // I can't do anything useful with this I don't know
+  // why I'm saving it.
   thread_handle: Option<JoinHandle<()>>,
 }
 
@@ -42,6 +44,20 @@ impl KbEvents {
       is_locked: Arc::new(AtomicBool::new(false)),
       obs_pid: Arc::new(AtomicU32::new(0)),
       thread_handle: None,
+    }
+  }
+
+  // Trying to make it consume self but I don't know if that'll work.
+  pub fn stop(&mut self) {
+    self.is_locked.store(true, Ordering::SeqCst);
+    let pid = self.obs_pid.load(Ordering::SeqCst);
+    if pid > 0 {
+      if let Err(msg) = kill_pid(pid) {
+        self.notifier.error_box(format!(
+          "Possibly failed to kill OBS, check task manager: {}",
+          msg
+        ));
+      }
     }
   }
 
