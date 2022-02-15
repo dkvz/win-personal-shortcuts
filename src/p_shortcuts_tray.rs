@@ -21,7 +21,7 @@ pub const APP_TITLE: &'static str = "Personal Shortcuts";
 #[derive(Default, NwgUi)]
 pub struct PShortcutsTray {
   #[nwg_control]
-  #[nwg_events(OnInit: [PShortcutsTray::init])]
+  #[nwg_events(OnInit: [PShortcutsTray::init], OnWindowClose: [PShortcutsTray::exit])]
   window: nwg::MessageWindow,
 
   //#[nwg_resource(source_file: Some("./resources/shrimp.ico"))]
@@ -143,6 +143,8 @@ impl PShortcutsTray {
   }
 
   fn exit(&self) {
+    // Will get called on normal kill signal or manually exiting.
+    
     nwg::stop_thread_dispatch();
   }
 }
