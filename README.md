@@ -58,12 +58,11 @@ https://github.com/gabdube/native-windows-gui/issues/232
 This only seems to work with the Visual Studio compiler. However I had the manifest set to require admin privileges so that may have been the issue, it's now commented out so we get a regular user level executable.
 
 # TODO
-- [ ] Quitting (or intercepting specific signals) should kill any recording in progress - Especially important if I start "hiding" OBS.
+- [x] Quitting (or intercepting specific signals) should kill any recording in progress - Especially important if I start "hiding" OBS.
 - [ ] Rebrand this project to that it's linked more closely to its purpose of replacing ShadowPlay.
 - [x] Add a config option to disable notifications completely except for errors.
 - [ ] Add a checkbox in the tray menu to be able to disable or enable notifications.
 - [ ] Allow configuring an alternate key to ScrLk, which would probably be a weird key like "-" and check for Ctrl.
 - [ ] We could have some option to run a post-treatment (using ffmpeg) on the captured video.
-- [ ] Try using ffmpeg instead of OBS Studio, should be smoother.
 - [x] Uncomment the windows subsystem thingy in main.rs.
 - [x] Load the notification icon from resources inside p_shortcuts_tray since I'm now using resources anyway.
